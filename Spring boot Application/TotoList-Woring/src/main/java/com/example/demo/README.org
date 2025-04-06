@@ -1,0 +1,263 @@
+* To Do list creatation
+** we have plan
+
+** spring boot configuration
+
+** Entity classes
+   Todo has many task. So one to many relationship.
+*** Task Entity
+#+Begin_src java
+  @Entity
+  public class Task {
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      private Long id;
+      
+      private String description;
+      private boolean completed;
+      
+      @ManyToOne
+      @JoinColumn(name = "todo_list_id")
+      private TodoList todoList;
+      
+      public Task() {
+      }
+      
+  	public Task(String description, boolean completed, TodoList todoList) {
+  		super();
+  		this.description = description;
+  		this.completed = completed;
+  		this.todoList = todoList;
+  	}
+
+  	public Long getId() {
+  		return id;
+  	}
+
+  	public void setId(Long id) {
+  		this.id = id;
+  	}
+
+  	public String getDescription() {
+  		return description;
+  	}
+
+  	public void setDescription(String description) {
+  		this.description = description;
+  	}
+
+  	public boolean isCompleted() {
+  		return completed;
+  	}
+
+  	public void setCompleted(boolean completed) {
+  		this.completed = completed;
+  	}
+
+  	public TodoList getTodoList() {
+  		return todoList;
+  	}
+
+  	public void setTodoList(TodoList todoList) {
+  		this.todoList = todoList;
+  	}
+    }
+#+End_src
+*** TodoList Entity
+#+Begin_src java
+  @Entity
+  public class TodoList {
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      private Long id;
+      
+      private String name;
+      
+      @OneToMany(mappedBy = "todoList", cascade = CascadeType.ALL, orphanRemoval = true)
+      private List<Task> tasks = new ArrayList<>();
+      
+      public TodoList() {
+      }
+      
+  	public TodoList(String name, List<Task> tasks) {
+  		this.name = name;
+  		this.tasks.addAll(tasks);	
+  	}
+
+  	public Long getId() {
+  		return id;
+  	}
+
+  	public void setId(Long id) {
+  		this.id = id;
+  	}
+
+  	public String getName() {
+  		return name;
+  	}
+
+  	public void setName(String name) {
+  		this.name = name;
+  	}
+
+  	public List<Task> getTasks() {
+  		return tasks;
+  	}
+
+  	public void setTasks(List<Task> tasks) {
+  		this.tasks = tasks;
+  	}  
+  }
+#+End_src
+
+** Repository
+   we create to Repository Interfaces
+*** TodoListRepository
+   #+Begin_src java
+     public interface TodoListRepository extends JpaRepository<TodoList, Long> {
+     }
+   #+End_src
+*** TaskRepository
+   #+Begin_src java
+     public interface TaskRepository extends JpaRepository<Task, Long> {
+     }
+   #+End_src
+
+** HTML file --> Templates
+    Create a file.html inside the Resources/templates.
+    Create js and css file in static folder.    
+*** In our project we are creating two html files
+**** todo_lists.html
+      Displays all todo lists and allows creating new ones and delete it.
+***** Form to create new todo list
+       #+Begin_src html
+            <!-- Form to create new todo list -->
+           <form th:action="@{/todos}" th:object="${newTodoList}" method="post">
+                <input type="text" th:field="*{name}" placeholder="New list name" required>
+                <button type="submit">Create List</button>
+           </form>
+        #+End_src
+   1) we use form to create list send as post method and input as text and sumbit as button.
+   2) th:action="@{/todos}" : Submits to the /todos POST endpoint. /todos is in controller class as @RequestMapping.
+   3) th:object="${newTodoList}": Binds to the empty TodoList object from controller.
+
+***** Display existing lists
+#+Begin_src html
+  <!-- Display existing lists -->
+  <div th:each="todoList : ${todoLists}">
+      <a th:href="@{/todos/{id}(id=${todoList.id})}" th:text="${todoList.name}">
+      <span th:text="${todoList.tasks.size()}">0</span>
+      <form th:action="@{/todos/{id}/delete(id=${todoList.id})}" method="post">
+          <button type="submit">Delete List</button>
+      </form>
+  </div>
+#+End_src
+****** 1. Th:each = "todoList : ${todoLists}" is like foreach loop todoList is temp and ${todoLists} is List from Controller class.
+        + Purpose: Loops through all todo lists
+        + Mechanics:
+           - ${todoLists} accesses the model attribute containing the collection of lists.
+           - For each iteration, the current item is assigned to todoList variable.
+           - Creates a <div> for each todo list in the collection.
+****** 2. th:href: Links to the individual list's task page
+     + URL Construction:
+         - @{/todos/{id}(id=${todoList.id})} builds a URL like /todos/1 (where 1 is the ID)
+         - Path variable {id} is replaced with todoList.id
+     + Link Text:
+         - th:text="${todoList.name}" displays the list's name as link text
+     + Behavior:
+         - Clicking this will call a @GetMapping("/todos/{id}") in the controller
+         - Typically shows the tasks for this specific list
+****** 3. Shows task count with tasks.size()
+        + Purpose: Shows how many tasks are in this list
+        + Mechanics:
+           - Accesses the tasks collection of the current todoList
+           - Calls size() to get the count
+           - Displays the number inside a <span>
+        + Default Text: "0" is shown if Thymeleaf doesn't process the template
+****** TODO 4. Delete form posts to the delete endpoint for confirmation
+       + URL Construction:
+           - @{/todos/{id}/delete(id=${todoList.id})} builds a URL like /todos/1/delete
+       + Submission:
+           - method="post" will call a @PostMapping("/todos/{id}/delete")
+           - The form submits the ID of the list to delete
+       + Button: Plain submit button that triggers the deletion
+**** tasks.html
+** Controller
+   Important If we want to interact with html and spring boot use Controller. If we use RestController the Model will not work.
+*** We want map the request to for forther use
+*** Category of action in controller class
+    1) 
+#+Begin_src java
+  @Controller
+@RequestMapping("/todos")
+public class TodoController {
+
+    @Autowired
+    private TodoListRepository todoListRepository;
+    
+    @Autowired
+    private TaskRepository taskRepository;
+
+    // Show all todo lists
+    @GetMapping
+    public String listTodoLists(Model model) {
+        model.addAttribute("todoLists", todoListRepository.findAll());
+        model.addAttribute("newTodoList", new TodoList());
+        return "todo-lists";
+    }
+
+    // Create new todo list
+    @PostMapping
+    public String createTodoList(@ModelAttribute TodoList todoList) {
+        todoListRepository.save(todoList);
+        return "redirect:/todos";
+    }
+
+    // Show tasks in a todo list
+    @GetMapping("/{listId}")
+    public String viewTodoList(@PathVariable Long listId, Model model) {
+        TodoList todoList = todoListRepository.findById(listId)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid list id"));
+        
+        model.addAttribute("todoList", todoList);
+        model.addAttribute("newTask", new Task());
+        return "tasks";
+    }
+
+    // Add task to a todo list
+    @PostMapping("/{listId}/tasks")
+    public String addTask(@PathVariable Long listId, @ModelAttribute Task task) {
+        TodoList todoList = todoListRepository.findById(listId)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid list id"));
+        
+        task.setTodoList(todoList);
+        taskRepository.save(task);
+        return "redirect:/todos/" + listId;
+    }
+
+    // Toggle task completion status
+    @PostMapping("/{listId}/tasks/{taskId}/toggle")
+    public String toggleTask(@PathVariable Long listId, @PathVariable Long taskId) {
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid task id"));
+        
+        task.setCompleted(!task.isCompleted());
+        taskRepository.save(task);
+        return "redirect:/todos/" + listId;
+    }
+
+    // Delete a task
+    @PostMapping("/{listId}/tasks/{taskId}/delete")
+    public String deleteTask(@PathVariable Long listId, @PathVariable Long taskId) {
+        taskRepository.deleteById(taskId);
+        return "redirect:/todos/" + listId;
+    }
+
+    // Delete a todo list
+    @PostMapping("/{listId}/delete")
+    public String deleteTodoList(@PathVariable Long listId) {
+        todoListRepository.deleteById(listId);
+        return "redirect:/todos";
+    }
+}
+#+End_src
