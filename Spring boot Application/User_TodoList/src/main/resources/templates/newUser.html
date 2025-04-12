@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Todo Lists</title>
+	<link rel="icon" type="image/x-icon" href="/aaeranLogo.ico" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+	<h2>Login</h2>
+		<form th:action="@{/todos/newUser}" th:object="${newUser}" method="post">
+		    <label for="name">Username:</label>
+		    <input type="text" th:field="*{userName}" name="userName" required />
+		    <button type="submit">Sign up</button>
+		</form>	
+		
+		<div class="text-start mb-3">
+		    <a href="/todos" class="btn btn-success">Back</a>
+		</div>
+		
+		<script th:if="${error}" th:inline="javascript">
+		    alert([[${error}]]);
+		</script>
+
+		<script th:if="${success}" th:inline="javascript">
+		    alert([[${success}]]);
+		</script>
+
+</body>
