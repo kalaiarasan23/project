@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>goals</title>
+	<link rel="icon" type="image/x-icon" href="/aaeranLogo.ico" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	  
+</head>
+<body>
+	<!--score board-->
+	<div class="container my-5">
+
+	    <!-- Match Scoreboard -->
+	    <div class="text-center mb-5">
+	        <h2 class="display-6">
+	            <span class="fw-semibold" th:text="${match.team1.name}">Team A</span>
+	            <span class="mx-2 text-primary" th:text="${match.team1Score}">3</span>
+	            <span class="mx-1">:</span>
+	            <span class="mx-2 text-danger" th:text="${match.team2Score}">4</span>
+	            <span class="fw-semibold" th:text="${match.team2.name}">Team B</span>
+	        </h2>
+	    </div>
+
+	    <!-- Goal Scorers (Side by Side) -->
+	    <div class="mb-5">
+	        <h4 class="text-center mb-4">⚽ Goal Scorers</h4>
+	        <div class="row">
+	            <!-- Team 1 Scorers -->
+	            <div class="col-md-6 border-end">
+	                <h5 class="text-center" th:text="${match.team1.name}">Team 1</h5>
+	                <ul class="list-group list-group-flush">
+	                    <li th:each="goal : ${match.goals}"
+	                        th:if="${goal.team.id == match.team1.id}"
+	                        class="list-group-item d-flex justify-content-between align-items-center">
+	                        <span th:text="${goal.player.name}">Player Name</span>
+	                        <span class="badge bg-primary" th:text="${goal.time} + ' min'">45 min</span>
+	                    </li>
+	                </ul>
+	            </div>
+
+	            <!-- Team 2 Scorers -->
+	            <div class="col-md-6">
+	                <h5 class="text-center" th:text="${match.team2.name}">Team 2</h5>
+	                <ul class="list-group list-group-flush">
+	                    <li th:each="goal : ${match.goals}"
+	                        th:if="${goal.team.id == match.team2.id}"
+	                        class="list-group-item d-flex justify-content-between align-items-center">
+	                        <span th:text="${goal.player.name}">Player Name</span>
+	                        <span class="badge bg-danger" th:text="${goal.time} + ' min'">45 min</span>
+	                    </li>
+	                </ul>
+	            </div>
+	        </div>
+	    </div>
+
+	    <!-- Add Goal Form -->
+	    <div class="card shadow-sm">
+	        <div class="card-header bg-success text-white">
+	            <h5 class="mb-0">➕ Add Goal</h5>
+	        </div>
+	        <div class="card-body">
+	            <form th:action="@{/tournaments/{tournamentId}/matches/{matchId}(tournamentId=${match.tournament.id}, matchId=${match.id})}"
+	                  th:object="${goal}" method="post">
+
+	                <!-- Select Team -->
+	                <div class="mb-3">
+	                    <label for="teamSelect" class="form-label">Team</label>
+	                    <select id="teamSelect" class="form-control" th:field="*{team.id}" onchange="updatePlayers()">
+	                        <option th:value="${match.team1.id}" th:text="${match.team1.name}" data-team="team1"></option>
+	                        <option th:value="${match.team2.id}" th:text="${match.team2.name}" data-team="team2"></option>
+	                    </select>
+	                </div>
+
+	                <!-- Select Player -->
+	                <div class="mb-3">
+	                    <label for="playerSelect" class="form-label">Player</label>
+	                    <select id="playerSelect" class="form-control" th:field="*{player.id}">
+	                        <option value="">-- Select Player --</option>
+
+	                        <!-- Players from Team 1 -->
+	                        <option th:each="player : ${match.team1.players}"
+	                                th:value="${player.id}" th:text="${player.name}"
+	                                data-team="team1"></option>
+
+	                        <!-- Players from Team 2 -->
+	                        <option th:each="player : ${match.team2.players}"
+	                                th:value="${player.id}" th:text="${player.name}"
+	                                data-team="team2"></option>
+	                    </select>
+	                </div>
+
+	                <!-- Minute Input -->
+	                <div class="mb-3">
+	                    <label for="minute" class="form-label">Minute</label>
+	                    <input type="number" class="form-control" th:field="*{time}" min="1" max="120" required>
+	                </div>
+
+	                <!-- Submit Button -->
+	                <div class="text-end">
+	                    <button type="submit" class="btn btn-primary">Add Goal</button>
+	                </div>
+	            </form>
+	        </div>
+	    </div>
+	</div>
+
+
+	<script>
+	function updatePlayers() {
+	    const selectedTeam = document.getElementById('teamSelect')
+	                                 .options[document.getElementById('teamSelect').selectedIndex]
+	                                 .getAttribute('data-team');
+
+	    const playerSelect = document.getElementById('playerSelect');
+	    const options = playerSelect.options;
+
+	    for (let i = 0; i < options.length; i++) {
+	        const opt = options[i];
+	        const team = opt.getAttribute('data-team');
+
+	        if (!team) continue; // skip placeholder like "-- Select Player --"
+
+	        if (team === selectedTeam) {
+	            opt.style.display = 'block';
+	        } else {
+	            opt.style.display = 'none';
+	        }
+	    }
+
+	    // Reset selected player
+	    playerSelect.value = '';
+	}
+	</script>
+
+
+</body>	
