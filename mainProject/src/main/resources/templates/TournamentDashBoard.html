@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${tournament.name}"></title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" type="image/x-icon" href="/aaeranLogo.ico" />
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+	<div class="container mt-5">
+		
+		<!-- Back Button -->
+		<div class="d-flex justify-content-end mb-2">
+		    <a th:href="@{/tournaments}" class="btn btn-outline-secondary">
+		        <i class="bi bi-arrow-left"></i> Back
+		    </a>
+		</div>
+		 
+		<!-- Tournament Header -->
+		<div class="text-center mb-4">
+			<h1 class="display-4" th:text="${tournament.name}">Tournament Name</h1>
+		</div>
+
+			<!-- Dashboard Cards -->
+		<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+				<!-- Add Team -->
+			<div class="col">
+				<a th:href="@{/tournaments/{id}/team(id=${tournament.id})}" class="text-decoration-none">
+					<div class="card shadow-sm text-center h-100 border-0 bg-success text-white">
+						<div class="card-body">
+							<i class="bi bi-person-plus display-5 mb-2"></i>
+							<h5 class="card-title">Add Team</h5>
+						</div>
+					</div>
+				</a>
+			</div>
+
+			<!-- See Teams 
+			<div class="col">
+				<a th:href="@{/tournaments/{id}/team(id=${tournament.id})}" class="text-decoration-none">
+					<div class="card shadow-sm text-center h-100 border-0 bg-primary text-white">
+						<div class="card-body">
+							<i class="bi bi-people display-5 mb-2"></i>
+							<h5 class="card-title">See Teams</h5>
+						</div>
+					</div>
+				</a>
+			</div>
+			-->
+			
+			<!-- See Matches -->
+			<div class="col">
+				<a th:href="@{/tournaments/{id}/matches(id=${tournament.id})}" class="text-decoration-none">
+					<div class="card shadow-sm text-center h-100 border-0 bg-warning text-dark">
+						<div class="card-body">
+							<i class="bi bi-trophy display-5 mb-2"></i>
+							<h5 class="card-title">See Matches</h5>
+						</div>
+					</div>
+				</a>
+			</div>
+
+			<!-- See Scorers -->
+			<div class="col">
+				<a th:href="@{/tournaments/{id}/scorers(id=${tournament.id})}" class="text-decoration-none">
+					<div class="card shadow-sm text-center h-100 border-0 bg-danger text-white">
+						<div class="card-body">
+							<i class="bi bi-bar-chart-line display-5 mb-2"></i>
+							<h5 class="card-title">Top Scorers</h5>
+						</div>
+					</div>
+				</a>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>

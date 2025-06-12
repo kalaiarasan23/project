@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Todo Lists</title>
+	<link rel="icon" type="image/x-icon" href="/aaeranLogo.ico" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+<body>
+<div class="container mt-4">
+    <h1>My Todo Lists</h1>
+	<!-- todo.html -->
+	<div th:if="${successMessage}" class="alert alert-success" role="alert">
+	    <span th:text="${successMessage}"></span>
+	</div>
+	<!-- link of back to login and create new user-->
+	<div class="d-flex justify-content-between mb-3">
+	    <a href="/todos/newUser" class="btn btn-success">Add User</a>
+	    <a href="/login" class="btn btn-secondary">Back</a>
+	</div>
+	
+    <!-- Form to create new todo list -->
+    <form th:action="@{/todos}" th:object="${newTodoList}" method="post" class="mb-4">
+        <div class="input-group">
+            <input type="text" th:field="*{name}" class="form-control" placeholder="New list name" required>
+            <button type="submit" class="btn btn-primary">Create List</button>
+        </div>
+    </form>
+    
+
+	<!-- list to display our task-->
+    <div th:each="todoList : ${todoLists}" class="card mb-3">
+        <div class="card-body">
+			
+		   <h2 class="card-title">
+                <a th:href="@{/todos/{id}(id=${todoList.id})}" th:text="${todoList.name}">List Name</a>
+                <span class="badge bg-secondary" th:text="${todoList.taskList.size()}">0</span>
+            </h2>
+            
+			<form th:action="@{/todos/{id}/delete(id=${todoList.id})}" method="post" class="d-inline">
+			    <button type="submit" class="btn btn-sm btn-danger">Delete List</button>
+			</form>
+
+        </div>
+    </div>
+	
+</div>
+</body>
+</html>

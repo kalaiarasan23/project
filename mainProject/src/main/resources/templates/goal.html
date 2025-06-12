@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <title>Goals</title>
+	<link rel="icon" type="image/x-icon" href="/aaeranLogo.ico" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card-header {
+            background: linear-gradient(90deg, #28a745, #218838);
+        }
+        .list-group-item {
+            background-color: #ffffff;
+        }
+        .score-board h2 span {
+            font-size: 1.75rem;
+        }
+        .btn-outline-secondary i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+	<div class="container my-5">
+		<!-- Back Button -->
+		<div class="d-flex justify-content-end mb-3">
+		    <a th:href="@{/tournaments/{tournamentId}/matches(tournamentId=${match.tournament.id})}" class="btn btn-outline-secondary">
+		        <i class="bi bi-arrow-left-circle"></i> Back
+		    </a>
+		</div>
+
+	    <!-- Match Scoreboard -->
+	    <div class="score-board text-center mb-5">
+	        <h2 class="display-6">
+	            <span class="fw-semibold text-dark" th:text="${match.team1.name}">Team A</span>
+	            <span class="mx-2 text-primary" th:text="${match.team1Score}">3</span>
+	            <span class="mx-1 text-muted">:</span>
+	            <span class="mx-2 text-danger" th:text="${match.team2Score}">4</span>
+	            <span class="fw-semibold text-dark" th:text="${match.team2.name}">Team B</span>
+	        </h2>
+	    </div>
+
+	    <!-- Goal Scorers -->
+	    <div class="mb-5">
+	        <h4 class="text-center mb-4">⚽ Goal Scorers</h4>
+	        <div class="row">
+	            <div class="col-md-6 border-end">
+	                <h5 class="text-center text-primary" th:text="${match.team1.name}">Team 1</h5>
+	                <ul class="list-group list-group-flush">
+	                    <li th:each="goal : ${match.goals}" th:if="${goal.team.id == match.team1.id}"
+	                        class="list-group-item d-flex justify-content-between align-items-center">
+	                        <span th:text="${goal.player.name}">Player Name</span>
+	                        <span class="badge bg-primary" th:text="${goal.time} + ' min'">45 min</span>
+	                    </li>
+	                </ul>
+	            </div>
+	            <div class="col-md-6">
+	                <h5 class="text-center text-danger" th:text="${match.team2.name}">Team 2</h5>
+	                <ul class="list-group list-group-flush">
+	                    <li th:each="goal : ${match.goals}" th:if="${goal.team.id == match.team2.id}"
+	                        class="list-group-item d-flex justify-content-between align-items-center">
+	                        <span th:text="${goal.player.name}">Player Name</span>
+	                        <span class="badge bg-danger" th:text="${goal.time} + ' min'">45 min</span>
+	                    </li>
+	                </ul>
+	            </div>
+	        </div>
+	    </div>
+
+	    <!-- Add Goal Form -->
+	    <div class="card shadow-sm border-0">
+	        <div class="card-header text-white">
+	            <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Add Goal</h5>
+	        </div>
+	        <div class="card-body">
+	            <form th:action="@{/tournaments/{tournamentId}/matches/{matchId}(tournamentId=${match.tournament.id}, matchId=${match.id})}"
+	                  th:object="${goal}" method="post">
+
+	                <div class="mb-3">
+	                    <label for="teamSelect" class="form-label">Team</label>
+	                    <select id="teamSelect" class="form-select" th:field="*{team.id}" onchange="updatePlayers()">
+	                        <option th:value="${match.team1.id}" th:text="${match.team1.name}" data-team="team1"></option>
+	                        <option th:value="${match.team2.id}" th:text="${match.team2.name}" data-team="team2"></option>
+	                    </select>
+	                </div>
+
+	                <div class="mb-3">
+	                    <label for="playerSelect" class="form-label">Player</label>
+	                    <select id="playerSelect" class="form-select" th:field="*{player.id}">
+	                        <option value="">-- Select Player --</option>
+	                        <option th:each="player : ${match.team1.players}" th:value="${player.id}" th:text="${player.name}"
+	                                data-team="team1" class="team1"></option>
+	                        <option th:each="player : ${match.team2.players}" th:value="${player.id}" th:text="${player.name}"
+	                                data-team="team2" class="team2"></option>
+	                    </select>
+	                </div>
+
+	                <div class="mb-3">
+	                    <label for="minute" class="form-label">Minute</label>
+	                    <input type="number" class="form-control" th:field="*{time}" min="1" max="120" required>
+	                </div>
+
+	                <div class="text-end">
+	                    <button type="submit" class="btn btn-success">
+	                        <i class="bi bi-check-circle me-1"></i> Add Goal
+	                    </button>
+	                </div>
+	            </form>
+	        </div>
+	    </div>
+	</div>
+
+	<script>
+	    document.addEventListener('DOMContentLoaded', function () {
+	        updatePlayers();
+	    });
+
+	    function updatePlayers() {
+	        const selectedTeam = document.getElementById('teamSelect')
+	            .options[document.getElementById('teamSelect').selectedIndex]
+	            .getAttribute('data-team');
+
+	        const playerSelect = document.getElementById('playerSelect');
+	        const options = playerSelect.options;
+
+	        for (let i = 0; i < options.length; i++) {
+	            const opt = options[i];
+	            const team = opt.getAttribute('data-team');
+
+	            if (!team) continue;
+
+	            opt.style.display = (team === selectedTeam) ? 'block' : 'none';
+	        }
+	        playerSelect.value = '';
+	    }
+	</script>
+</body>
+</html>

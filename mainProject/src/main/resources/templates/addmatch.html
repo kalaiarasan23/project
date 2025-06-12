@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/x-icon" href="/aaeranLogo.ico" />
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>match</title>
+</head>
+
+<body>
+	<div class="container mt-4">
+			<!-- Back Button -->
+			<div class="d-flex justify-content-end mb-2">
+			    <a th:href="@{/tournaments/{id}(id=${tournament.id})}" class="btn btn-outline-secondary">
+			        <i class="bi bi-arrow-left"></i> Back
+			    </a>
+			</div>
+		    <h1>Tournament <span>Creation</span></h1>
+					
+			<div class="container mt-5">
+			    <h2 class="mb-4">Create Match</h2>
+
+			    <form th:action="@{/tournaments/{id}/matches(id=${tournament.id})}" th:object="${newmatch}" method="post" class="p-4 border rounded bg-light shadow-sm">
+
+			        <!-- Team A -->
+			        <div class="mb-3">
+			            <label for="teamA" class="form-label">Team A</label>
+			            <input type="text" id="teamA" name="teamA" list="teamsA" class="form-control" placeholder="Select Team A" required>
+			            <datalist id="teamsA">
+			                <option th:each="team : ${tournament.teams}" th:text="${team.name}"></option>
+			            </datalist>
+			        </div>
+
+			        <!-- Team B -->
+			        <div class="mb-3">
+			            <label for="teamB" class="form-label">Team B</label>
+			            <input type="text" id="teamB" name="teamB" list="teamsB" class="form-control" placeholder="Select Team B" required>
+			            <datalist id="teamsB">
+			                <option th:each="team : ${tournament.teams}"  th:text="${team.name}"></option>
+			            </datalist>
+			        </div>
+
+			        <!-- Submit -->
+			        <div class="d-grid">
+			            <button type="submit" class="btn btn-primary">Create Match</button>
+			        </div>
+
+			    </form>
+			</div>
+	<script>
+	    const teamAInput = document.getElementById('teamA');
+	    const teamBInput = document.getElementById('teamB');
+	    const datalistB = document.getElementById('teamsB');
+	    const allOptions = Array.from(datalistB.options);
+
+	    teamAInput.addEventListener('input', () => {
+	        const selectedTeamA = teamAInput.value;
+
+	        // Clear all current options
+	        datalistB.innerHTML = '';
+
+	        // Re-add only those not equal to Team A
+	        allOptions.forEach(option => {
+	            if (option.value !== selectedTeamA) {
+	                datalistB.appendChild(option.cloneNode(true));
+	            }
+	        });
+
+	        // Optional: clear Team B if it's the same as Team A
+	        if (teamBInput.value === selectedTeamA) {
+	            teamBInput.value = '';
+	        }
+	    });
+	</script>
+
+	
+</body>

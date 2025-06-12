@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Aaeran FC</title>
+    <link rel="icon" type="image/x-icon" href="/aaeranLogo.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <style>
+        body {
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            color: white;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .welcome-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 2rem;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .welcome-card h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .welcome-card img {
+            width: 80px;
+            margin-bottom: 1rem;
+        }
+        .btn-custom {
+            width: 200px;
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="welcome-card">
+        <img src="/aaeranLogo.ico" alt="Aaeran FC Logo">
+        <h1>Welcome to Aaeran FC</h1>
+        <p class="mb-4">Your football management dashboard</p>
+
+		<a href="/login" class="btn btn-lg btn-custom" style="background-color: #00d2ff; color: #000; border: none;">
+		    🔐 Login
+		</a><br>
+		<a href="/tournaments" class="btn btn-lg btn-custom" style="background-color: #00ff87; color: #000; border: none;">
+		    ⚽ Conducted Tournaments
+		</a><br>
+		<a href="/tournaments/participate" class="btn btn-lg btn-custom" style="background-color: #00ff87; color: #000; border: none;">
+		    ⚽ Tournaments Participated
+		</a>
+		
+    </div>
+
+</body>
+</html>

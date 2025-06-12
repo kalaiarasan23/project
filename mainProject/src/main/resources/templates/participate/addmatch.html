@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="icon" type="image/x-icon" href="/aaeranLogo.ico" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>match</title>
+</head>
+
+<body>
+	<div class="container mt-4">
+		<h1>Tournament <span>Creation</span></h1>
+		<div class="d-flex gap-2 mb-3">
+			<form th:action="@{/tournaments/participate/{id}/team/{team_id}/matches(id=${team.tournament.id},team_id=${team.id})}" method="get">
+				<button type="submit" class="btn btn-success">
+					<i class="bi bi-arrow-left"></i> back
+				</button>
+			</form>
+		</div>
+		<div class="container mt-5">
+			<h2 class="mb-4">Create Match</h2>
+
+			<form th:action="@{/tournaments/participate/{id}/team/{team_id}/matches(id=${team.tournament.id},team_id =${team.id} )}"
+				method="post" class="p-4 border rounded bg-light shadow-sm">
+				<!-- Fixed Team A (your team) -->
+				<div class="mb-3">
+					<label for="teamA" class="form-label">Team A (Your Team)</label>
+					<input type="text" id="teamA" name="team1" class="form-control" th:value="${team.name}" readonly>
+					<input type="hidden" name="team1Id" th:value="${team.id}" />
+				</div>
+
+				<!-- Team B Selection -->
+				<div class="mb-3">
+					<label for="teamB" class="form-label">Team B (Opponent)</label>
+					<input type="text" id="teamB" name="teamB" class="form-control"
+						placeholder="Enter opponent team name" required>
+				</div>
+
+				<!-- Team B Place 
+			          <div class="mb-3">
+			              <label for="teamBPlace" class="form-label">Opponent Team Place</label>
+			              <input type="text" id="teamBPlace" name="team2Place" class="form-control" placeholder="e.g., City, Stadium">
+			          </div>
+					-->
+
+
+				<!-- Submit -->
+				<div class="d-grid">
+					<button type="submit" class="btn btn-primary">Create Match</button>
+				</div>
+
+
+
+			</form>
+		</div>
+	</div>
+
+
+</body>

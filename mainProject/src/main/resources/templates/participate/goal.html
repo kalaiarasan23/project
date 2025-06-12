@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Match Goals</title>
+    <link rel="icon" type="image/x-icon" href="/aaeranLogo.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container my-5">
+        <!-- Back Button -->
+        <div class="d-flex justify-content-end mb-3">
+            <a th:href="@{/tournaments/participate/{tournamentId}/team/{team_id}/matches(tournamentId=${match.tournament.id},team_id=${match.team1.id})}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+
+        <!-- Score Display Section -->
+        <div class="text-center mb-5">
+            <h2 class="mb-3">🏆 Current Match Score</h2>
+            <div class="card p-4 shadow-sm mb-4 d-inline-block">
+                <div class="d-flex align-items-center justify-content-center">
+					<div class="card p-4 shadow-sm mb-4 mx-auto" style="width: 600px;">
+					    <div class="d-flex align-items-center justify-content-center">
+					        <div class="me-4 text-end">
+					            <h5 th:text="${match.team1.name}">Team A</h5>
+					            <div class="fs-1 fw-bold text-primary" th:text="${match.team1Goal}">0</div>
+					        </div>
+					        <div class="mx-3 fs-1 fw-bold">:</div>
+					        <div class="ms-4 text-start">
+					            <h5 th:text="${match.team2}">Team B</h5>
+					            <div class="fs-1 fw-bold text-danger" th:text="${match.team2Goal}">0</div>
+					        </div>
+					    </div>
+					</div>
+
+                </div>
+            </div>
+
+            <!-- Score Update Form -->
+            <h4 class="mb-3">📝 Update Score</h4>
+            <form th:action="@{/tournaments/participate/{tournamentId}/team/{team_id}/matches/{matchId}/goal-update(tournamentId=${match.tournament.id},team_id=${match.team1.id},matchId=${match.id})}" method="post" class="d-flex justify-content-center gap-3">
+                <div class="text-center">
+                    <label for="team1GoalInput" class="form-label">Team 1</label>
+                    <input id="team1GoalInput" name="team1Goal" type="number" class="form-control text-center border-primary" style="width: 100px;" min="0" th:value="${match.team1Goal}" required />
+                </div>
+                <div class="text-center">
+                    <label for="team2GoalInput" class="form-label">Team 2</label>
+                    <input id="team2GoalInput" name="team2Goal" type="number" class="form-control text-center border-danger" style="width: 100px;" min="0" th:value="${match.team2Goal}" required />
+                </div>
+                <div class="align-self-end">
+                    <button type="submit" class="btn btn-outline-primary">Update</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Goal Scorers -->
+        <div class="mb-5">
+            <h4 class="text-center mb-4">⚽ Goal Scorers</h4>
+            <div class="row">
+                <div class="col-md-6 border-end">
+                    <h5 class="text-center" th:text="${match.team1.name}">Team 1</h5>
+                    <ul class="list-group list-group-flush">
+                        <li th:each="goal : ${match.goals}" class="list-group-item d-flex justify-content-between align-items-center">
+                            <span th:text="${goal.player.name}">Player Name</span>
+                            <span class="badge bg-primary" th:text="${goal.time} + ' min'">45 min</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Goal Form -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">➕ Add Goal</h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/tournaments/participate/{tournamentId}/team/{team_id}/matches/{matchId}(tournamentId=${match.tournament.id}, team_id=${match.team1.id}, matchId=${match.id})}" th:object="${goal}" method="post">
+                    <div class="mb-3">
+                        <label for="playerSelect" class="form-label">Player</label>
+                        <select id="playerSelect" class="form-control" th:field="*{player.id}" required>
+                            <option value="">-- Select Player --</option>
+                            <option th:each="player : ${match.team1.players}" th:value="${player.id}" th:text="${player.name}"></option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="minute" class="form-label">Minute</label>
+                        <input type="number" class="form-control" th:field="*{time}" min="1" max="120" required>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Add Goal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
